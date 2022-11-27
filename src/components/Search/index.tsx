@@ -1,13 +1,13 @@
 import { debounce } from "lodash";
 import { useEffect, useRef, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
-import { AutoComplete, Button, Space } from "antd";
+import { AutoComplete, Button, Space, Spin } from "antd";
 
 import { AppDispatch, RootState } from "../../store";
 import { clearMap, searchLocation, setLocation } from "../../store/mapSlice";
 
 const Search = () => {
-  const { options } = useSelector((state: RootState) => state.map);
+  const { options, isLoading } = useSelector((state: RootState) => state.map);
   const [value, setValue] = useState<string>("");
   const dispatch = useDispatch<AppDispatch>();
 
@@ -48,7 +48,7 @@ const Search = () => {
   };
 
   return (
-    <Space className="searchcomponent">
+    <Space className="searchcomponent" size={16}>
       <AutoComplete
         value={value}
         options={options}
@@ -58,6 +58,7 @@ const Search = () => {
         className="dropdown"
         placeholder="Enter Location... (3 character min.)"
       />
+      {isLoading && <Spin />}
       <Button type="primary" onClick={onReset}>
         Reset
       </Button>

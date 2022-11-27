@@ -11,12 +11,15 @@ type LocResponseType = {
 export interface LocationState {
   latitude: number;
   longitude: number;
+  isLoading: boolean;
   options: { label: string; value: string }[];
 }
 
+//defaulting to greenwich
 const initialState: LocationState = {
   latitude: 51.4825766,
   longitude: -0.0076589,
+  isLoading: false,
   options: [],
 };
 
@@ -25,7 +28,7 @@ const SECRET_KEY = "a83de4d87f3889a7b2c7c288b5333dfa";
 const LOC_URL = "https://api.roadgoat.com/api/v2/destinations";
 
 export const searchLocation = createAsyncThunk(
-  "option/fetchByIdStatus",
+  "map/fetchOptions",
   async (query: string) => {
     const res = await fetch(LOC_URL + "/auto_complete?q=" + query, {
       headers: {
@@ -52,9 +55,13 @@ export const mapSlice = createSlice({
     },
   },
   extraReducers: (builder) => {
+    builder.addCase(searchLocation.pending, (state) => {
+      state.isLoading = true;
+    });
     builder.addCase(searchLocation.fulfilled, (state, action) => {
       const { data } = action.payload;
 
+      state.isLoading = false;
       state.options = data.map((item: LocResponseType) => ({
         label: item.attributes.long_name,
         value: JSON.stringify({
